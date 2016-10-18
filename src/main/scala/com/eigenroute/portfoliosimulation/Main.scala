@@ -6,13 +6,19 @@ import akka.routing.SmallestMailboxPool
 object Main extends App {
   val system = ActorSystem("PortfolioSimulationActorSystem")
 
-  val investmentPeriodsGenerator = system.actorOf(Props[InvestmentPeriodsGenerator], "investmentPeriodsGenerator")
-  val routerToSimulator = system.actorOf(Props[PortfolioSimulator].withRouter(SmallestMailboxPool(nrOfInstances = 8)))
+  val reaper = system.actorOf(Props[ReaperImpl], "reaper")
+
+  val investmentPeriodsGenerator = system.actorOf(Props(classOf[InvestmentPeriodsGenerator], reaper), "investmentPeriodsGenerator")
+  val routerToSimulator = system.actorOf(Props(classOf[PortfolioSimulator], reaper).withRouter(SmallestMailboxPool(nrOfInstances = 8)))
+  val resultsWriter = system.actorOf(Props(classOf[ResultsWriter], reaper))
+
   val portfolioSimulationManager =
-    system.actorOf(Props(classOf[PortfolioSimulationManager], investmentPeriodsGenerator, routerToSimulator), "portfolioSimulator")
+    system.actorOf(Props(classOf[PortfolioSimulationManager],
+      reaper,
+      investmentPeriodsGenerator,
+      routerToSimulator,
+      resultsWriter), "portfolioSimulator")
 
   portfolioSimulationManager ! "here are your parameters"
 
-  Thread.sleep(200)
-  system.shutdown()
 }

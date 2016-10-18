@@ -1,9 +1,9 @@
 package com.eigenroute.portfoliosimulation
 
-import akka.actor.{Actor, ActorRef}
+import akka.actor.{ActorLogging, Actor, ActorRef}
 import com.eigenroute.portfoliosimulation.Reaper.WatchMe
 
-abstract class WatchedActor(reaper: ActorRef) extends Actor {
+abstract class WatchedActor(reaper: ActorRef) extends Actor with ActorLogging {
 
   reaper ! WatchMe(self)
 

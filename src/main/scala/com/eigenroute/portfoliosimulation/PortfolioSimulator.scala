@@ -1,12 +1,13 @@
 package com.eigenroute.portfoliosimulation
 
-import akka.actor.{ActorLogging, Actor}
+import akka.actor.ActorRef
 
-class PortfolioSimulator extends Actor with ActorLogging {
+class PortfolioSimulator(reaper: ActorRef) extends WatchedActor(reaper) {
 
   override def receive = {
-    case message: Any =>
-      log.info(s"Portfolio simulator received message: $message")
+    case investmentPeriod: InvestmentPeriod =>
+      log.info(s"\n\n Portfolio simulator received message: $investmentPeriod")
+      sender() ! RebalancedPortfolio(investmentPeriod, Seq(), Seq(), 0, 0d, null, 0, null, 0, 0)
   }
 
 }

@@ -16,8 +16,7 @@ abstract class Reaper extends Actor with ActorLogging {
 
   def allSoulsReaped(): Unit
 
-  // Watch and check for termination
-  final def receive = {
+  final override def receive = {
     case WatchMe(ref) =>
       context.watch(ref)
       watched = watched :+ ref
