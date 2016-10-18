@@ -1,4 +1,4 @@
-activator-akka-scala-seed
-=========================
+Portfolio Simulation
+====================
 
-A minimal seed template for an Akka with Scala build 
+This is a re-implementation of the [Portfolio Analysis](https://github.com/shafiquejamal/portfolioanalysis) project, using Akka actors. 
