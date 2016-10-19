@@ -1,18 +1,27 @@
 package com.eigenroute.portfoliosimulation
 
 import akka.actor.ActorRef
-import org.joda.time.DateTime
+import com.eigenroute.portfoliosimulation.InvestmentPeriodsGenerator.GenerateInvestmentPeriods
+
+object InvestmentPeriodsGenerator {
+
+  case class GenerateInvestmentPeriods(
+      portfolioDesign: PortfolioDesign,
+      sortedCommonDatesETFData:Seq[ETFData],
+      investmentDurationYears: Int)
+
+}
 
 class InvestmentPeriodsGenerator(reaper: ActorRef) extends WatchedActor(reaper) {
 
   override def receive = {
-    case anyMessage:String =>
-      log.info(s"\n\n InvestmentPeriodsGenerator:  received message: $anyMessage")
-      val startDate = new DateTime(2010, 1, 1, 0, 0, 0)
-      val investmentPeriods = 0.to(2).toSeq.map { n =>
-        InvestmentPeriod(startDate.plusDays(n), startDate.plusDays(n).plusYears(5))
-      }
-      sender() ! InvestmentPeriods(investmentPeriods)
+    case generateInvestmentPeriods:GenerateInvestmentPeriods =>
+      log.info(s"\n\n InvestmentPeriodsGenerator:  received message: $generateInvestmentPeriods")
+      val foo = new InvestmentPeriodsCreator(
+        generateInvestmentPeriods.portfolioDesign,
+        generateInvestmentPeriods.sortedCommonDatesETFData,
+        generateInvestmentPeriods.investmentDurationYears).create
+      sender() ! InvestmentPeriods(foo)
       context.stop(self)
   }
 

@@ -1,7 +1,6 @@
 package com.eigenroute.portfoliosimulation
 
 case class RebalancedPortfolio(
-    investmentPeriod: InvestmentPeriod,
     rebalancedETFData: Seq[ETFData],
     newQuantitiesChosenForThisRebalancing: Seq[FinalPortfolioQuantityToHave],
     accumulatedExDiv: BigDecimal,

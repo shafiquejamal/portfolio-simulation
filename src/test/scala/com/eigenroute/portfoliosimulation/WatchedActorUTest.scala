@@ -17,7 +17,7 @@ class WatchedActorUTest
 
     val watchedActor = system.actorOf(Props(classOf[TestWatchedActorImpl], reaper), "watched-actor")
 
-    Thread.sleep(5)
+    Thread.sleep(50)
     reaper.underlyingActor.watched should contain(watchedActor)
 
   }

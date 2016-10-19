@@ -12,6 +12,7 @@ trait PortfolioFixture {
   val eTFB = ETFCode("BBB")
   val eTFC = ETFCode("CCC")
   val eTFD = ETFCode("DDD")
+  val eTFNotInSnapshot = ETFCode("BAD")
 
   val eTFDataPlusA = ETFData(now, eTFA, "1", 20, 0, 50)
   val eTFDataPlusB = ETFData(now, eTFB, "1", 30, 0, 100)
@@ -24,6 +25,18 @@ trait PortfolioFixture {
   val eTFDSelection = ETFSelection(eTFD, 0.15)
 
   val portfolioDesign = PortfolioDesign(Seq(eTFASelection, eTFBSelection, eTFCSelection, eTFDSelection))
+  val portfolioSnapshot = PortfolioSnapshot(Seq(eTFDataPlusA, eTFDataPlusB, eTFDataPlusC, eTFDataPlusD))
+  val portfolioSnapshotZeroQuantity =
+    PortfolioSnapshot(portfolioSnapshot.sameDateUniqueCodesETFDatas.map(_.copy(quantity = 0d)))
+
+  val weightDifferences = Seq(
+    PortfolioWeightDifference(eTFA, 0.15),
+    PortfolioWeightDifference(eTFB, 0.2),
+    PortfolioWeightDifference(eTFC, -0.3),
+    PortfolioWeightDifference(eTFD, -0.05)
+  )
+
+  def round(numberToRound: BigDecimal, n: Int = 5): BigDecimal = numberToRound.setScale(n, BigDecimal.RoundingMode.HALF_UP)
 
   trait PortfolioFiles {
     val portfolioDesignPath = new File("src/test/scala/com/eigenroute/portfoliosimulation/portfolioDesign.csv")
@@ -290,6 +303,115 @@ trait PortfolioFixture {
             BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
                                                                                                     }
+  }
+
+  trait DesiredValueFixture {
+    val expectedDesiredValuesOneNotTraded = Seq(
+      ETFDesiredValue(eTFA, 2355.88235, isToTrade = true),
+      ETFDesiredValue(eTFB, 4711.76471, isToTrade = true),
+      ETFDesiredValue(eTFC, 942.35294, isToTrade = true),
+      ETFDesiredValue(eTFD, 2000.00000, isToTrade = false)
+    )
+
+    val expectedDesiredValuesAllToBeTraded = Seq(
+      ETFDesiredValue(eTFA, 2500d, isToTrade = true),
+      ETFDesiredValue(eTFB, 5000d, isToTrade = true),
+      ETFDesiredValue(eTFC, 1000d, isToTrade = true),
+      ETFDesiredValue(eTFD, 1500d, isToTrade = true)
+    )
+
+    val expectedDesiredValuesAllToBeTradedcost15ExDivCash100 = Seq(
+      ETFDesiredValue(eTFA, 2510d, isToTrade = true),
+      ETFDesiredValue(eTFB, 5020d, isToTrade = true),
+      ETFDesiredValue(eTFC, 1004d, isToTrade = true),
+      ETFDesiredValue(eTFD, 1506d, isToTrade = true)
+    )
+
+    val expectedDesiredValuesNoTrades = Seq(
+      ETFDesiredValue(eTFA, 1000d, isToTrade = false),
+      ETFDesiredValue(eTFB, 3000d, isToTrade = false),
+      ETFDesiredValue(eTFC, 4000d, isToTrade = false),
+      ETFDesiredValue(eTFD, 2000d, isToTrade = false)
+    )
+
+    val expectedDesiredValuesFirstTrades = Seq(
+      ETFDesiredValue(eTFA, 2500d, isToTrade = true),
+      ETFDesiredValue(eTFB, 5000d, isToTrade = true),
+      ETFDesiredValue(eTFC, 1000d, isToTrade = true),
+      ETFDesiredValue(eTFD, 1500d, isToTrade = true)
+    )
+
+    val expectedValueDifferenceOneNotTraded = Seq(
+      PortfolioValueDifference(eTFA, 1355.88235),
+      PortfolioValueDifference(eTFB, 1711.76471),
+      PortfolioValueDifference(eTFC, -3057.64706),
+      PortfolioValueDifference(eTFD, 0.00000)
+    )
+
+    val expectedValueDifferenceOneNotTradedOneNotMatched = Seq(
+      PortfolioValueDifference(eTFA, 1355.88235),
+      PortfolioValueDifference(eTFB, 4711.76471),
+      PortfolioValueDifference(eTFC, -3057.64706),
+      PortfolioValueDifference(eTFD, 0.00000)
+    )
+
+    val expectedValueDifferenceNoTrades = Seq(
+      PortfolioValueDifference(eTFA, 0d),
+      PortfolioValueDifference(eTFB, 0d),
+      PortfolioValueDifference(eTFC, 0d),
+      PortfolioValueDifference(eTFD, 0d)
+    )
+
+    val expectedValueDifferenceAllTrades = Seq(
+      PortfolioValueDifference(eTFA, 1500d),
+      PortfolioValueDifference(eTFB, 2000d),
+      PortfolioValueDifference(eTFC, -3000d),
+      PortfolioValueDifference(eTFD, -500d)
+    )
+
+    val expectedValueDifferenceFirstTrades = Seq(
+      PortfolioValueDifference(eTFA, 2500d),
+      PortfolioValueDifference(eTFB, 5000d),
+      PortfolioValueDifference(eTFC, 1000d),
+      PortfolioValueDifference(eTFD, 1500d)
+    )
+  }
+
+  trait EstimatedQuantitiesToAcquire {
+    val expectedFirstEstimateQuantitiesAllTrades = Seq(
+      PortfolioQuantityToAcquire(eTFA, 74, round(20 * (1 + 0.0011)), 74.91759),
+      PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0011)), 66.59341),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0011)), -75.0825),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0011)), -10.011)
+    )
+
+    val expectedFirstEstimateQuantitiesAllTradesExpensive = Seq(
+      PortfolioQuantityToAcquire(eTFA, 74, round(20 * (1 + 0.0025)), 74.81297),
+      PortfolioQuantityToAcquire(eTFB, 66, round(30 * (1 + 0.0025)), 66.50042),
+      PortfolioQuantityToAcquire(eTFC, -76, round(40 / (1 + 0.0025)), -75.1875),
+      PortfolioQuantityToAcquire(eTFD, -11, round(50 / (1 + 0.0025)), -10.025)
+    )
+
+    val expectedFirstEstimateQuantitiesOneNotTraded = Seq(
+      PortfolioQuantityToAcquire(eTFA, 67, round(20 * (1 + 0.0011)), 67.71963),
+      PortfolioQuantityToAcquire(eTFB, 56, round(30 * (1 + 0.0011)), 56.99613),
+      PortfolioQuantityToAcquire(eTFC, -77, round(40 / (1 + 0.0011)), -76.52526),
+      PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
+    )
+
+    val expectedFirstEstimateQuantitiesNoTrades = Seq(
+      PortfolioQuantityToAcquire(eTFA, 0, round(20 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFB, 0, round(30 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFC, 0, round(40 / (1 + 0.0011)), 0),
+      PortfolioQuantityToAcquire(eTFD, 0, round(50 / (1 + 0.0011)), 0)
+    )
+
+    val expectedFirstEstimateQuantitiesFirstTrades = Seq(
+      PortfolioQuantityToAcquire(eTFA, 124, round(20 * (1 + 0.0011)), 124.86265),
+      PortfolioQuantityToAcquire(eTFB, 166, round(30 * (1 + 0.0011)), 166.48353),
+      PortfolioQuantityToAcquire(eTFC, 24, round(40 * (1 + 0.0011)), 24.97253),
+      PortfolioQuantityToAcquire(eTFD, 29, round(50 * (1 + 0.0011)), 29.96704)
+    )
   }
 
 }

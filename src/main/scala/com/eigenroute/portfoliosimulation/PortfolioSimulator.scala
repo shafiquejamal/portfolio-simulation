@@ -5,9 +5,20 @@ import akka.actor.ActorRef
 class PortfolioSimulator(reaper: ActorRef) extends WatchedActor(reaper) {
 
   override def receive = {
-    case investmentPeriod: InvestmentPeriod =>
-      log.info(s"\n\n Portfolio simulator received message: $investmentPeriod")
-      sender() ! RebalancedPortfolio(investmentPeriod, Seq(), Seq(), 0, 0d, null, 0, null, 0, 0)
+    case simulationParametersWithInvestmentPeriod: SimulationParametersWithInvestmentPeriod =>
+      val simulationParameters = simulationParametersWithInvestmentPeriod.simulationParameters
+      val rebalancePortfolio =
+        new Investment(
+          simulationParametersWithInvestmentPeriod.investmentPeriod,
+          simulationParameters.rebalancingInterval,
+          simulationParameters.initialInvestment,
+          simulationParameters.perTransactionTradingCost,
+          simulationParameters.bidAskCostFractionOfNav,
+          simulationParameters.portfolioDesign,
+          simulationParameters.maxAllowedDeviation,
+          simulationParameters.sortedCommonDatesETFData
+        ).rebalancePortfolio
+      sender() ! rebalancePortfolio
   }
 
 }

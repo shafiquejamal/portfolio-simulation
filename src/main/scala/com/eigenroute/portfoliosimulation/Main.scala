@@ -42,6 +42,17 @@ object Main extends App {
       routerToSimulator,
       resultsWriter), "portfolioSimulator")
 
-  portfolioSimulationManager ! "here are your parameters"
+  val simulationParameters =
+    SimulationParameters(
+      portfolioDesign,
+      sortedCommonDatesETFData,
+      investmentDurationYears,
+      rebalancingInterval,
+      initialInvestment,
+      perTransactionTradingCost,
+      bidAskCostFractionOfNav,
+      maxAllowedDeviation)
+
+  portfolioSimulationManager ! simulationParameters
 
 }
