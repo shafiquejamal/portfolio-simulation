@@ -19,7 +19,7 @@ class MainATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
       tempOutputFile.getAbsolutePath
     )
 
-    // Try(Main.main(args)) shouldBe a[Success[_]]
+    Try(Main.main(args)) shouldBe a[Success[_]]
   }
 
   it should "work with with a portfolio that contains a single ETF only" in new PortfolioFiles {
@@ -35,7 +35,7 @@ class MainATest extends FlatSpec with ShouldMatchers with PortfolioFixture {
       tempOutputFile.getAbsolutePath
     )
 
-    // Try(Main.main(args)) shouldBe a[Success[_]]
+    Try(Main.main(args)) shouldBe a[Success[_]]
 
   }
 

@@ -33,12 +33,14 @@ class PortfolioSimulationManager(
       simulationParametersWithInvestmentPeriods foreach ( parametersAndInvestmentPeriods =>
         routerToSimulator ! parametersAndInvestmentPeriods )
     case rebalancedPortfolio: RebalancedPortfolio =>
-      // log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${rebalancedPortfolio.portfolioPerformance}")
+      log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${rebalancedPortfolio.portfolioPerformance}")
       investmentPeriodsProcessed = investmentPeriodsProcessed + rebalancedPortfolio.portfolioPerformance.investmentPeriod
-      resultsWriter ! rebalancedPortfolio
-      // log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${investmentPeriodsProcessed.size} >= ${investmentPeriodsToProcess.size} ?")
+      resultsWriter ! rebalancedPortfolio.portfolioPerformance
+      if (simulationParameters.isWriteHistoricalRebalanced) resultsWriter ! rebalancedPortfolio
+      log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${investmentPeriodsProcessed.size} >= ${investmentPeriodsToProcess.size} ?")
       if (investmentPeriodsProcessed.size >= investmentPeriodsToProcess.size) {
         context.stop(routerToSimulator)
+        resultsWriter ! simulationParameters
         resultsWriter ! PoisonPill
         context.stop(self)
       }

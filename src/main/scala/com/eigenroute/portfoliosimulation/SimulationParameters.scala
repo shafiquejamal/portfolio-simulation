@@ -8,4 +8,5 @@ case class SimulationParameters(
     initialInvestment: BigDecimal,
     perTransactionTradingCost: BigDecimal,
     bidAskCostFractionOfNav: BigDecimal,
-    maxAllowedDeviation: BigDecimal)
+    maxAllowedDeviation: BigDecimal,
+    isWriteHistoricalRebalanced: Boolean)

@@ -25,6 +25,7 @@ object Main {
     val outputFilePath = new File(args(7))
     val portfolioDesign = PortfolioDesign(portfolioDesignPath)
     val sortedCommonDatesETFData = new ETFDataFetcher(new ETFDAO(new DevProdDBConfig())).fetch(portfolioDesign)
+    val isWriteHistoricalRebalanced = Try(args(8)).toOption.fold(false){_.toLowerCase.startsWith("y")}
 
     val system = ActorSystem("PortfolioSimulationActorSystem")
 
@@ -55,7 +56,8 @@ object Main {
         initialInvestment,
         perTransactionTradingCost,
         bidAskCostFractionOfNav,
-        maxAllowedDeviation)
+        maxAllowedDeviation,
+        isWriteHistoricalRebalanced)
 
     portfolioSimulationManager ! simulationParameters
   }

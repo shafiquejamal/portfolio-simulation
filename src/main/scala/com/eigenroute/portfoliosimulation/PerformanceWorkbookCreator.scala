@@ -3,9 +3,12 @@ package com.eigenroute.portfoliosimulation
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import org.joda.time.format.DateTimeFormat
 
-class PerformanceWorkbookWriter {
+class PerformanceWorkbookCreator {
 
-  def write(rebalancedPortfolio: RebalancedPortfolio, sheetName: String, datePattern: String = "yyyy-MM-dd"): XSSFWorkbook = {
+  def create(
+      rebalancedPortfolio: RebalancedPortfolio,
+      sheetName: String,
+      datePattern: String = "yyyy-MM-dd"): XSSFWorkbook = {
     val wb = new XSSFWorkbook()
     val sheet = wb.createSheet(sheetName)
     val dateTimeFormatter = DateTimeFormat.forPattern(datePattern)
