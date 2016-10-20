@@ -1,9 +1,9 @@
 package com.eigenroute.portfoliosimulation
 
-import org.apache.commons.io.FilenameUtils
-import java.io.{FileOutputStream, File}
+import java.io.{File, FileOutputStream}
 
 import akka.actor.ActorRef
+import org.apache.commons.io.FilenameUtils
 import org.joda.time.format.DateTimeFormat
 
 class ResultsWriter(reaper: ActorRef, file: File) extends WatchedActor(reaper) {
@@ -12,6 +12,7 @@ class ResultsWriter(reaper: ActorRef, file: File) extends WatchedActor(reaper) {
   var portfolioPerformances: Seq[PortfolioPerformance] = Seq.empty
 
   override def receive = {
+
     case rebalancedPortfolio: RebalancedPortfolio =>
       log.info(s"\n\n ResultsWriter: RebalancedPortfolio: ${rebalancedPortfolio.portfolioPerformance}")
 
@@ -25,9 +26,11 @@ class ResultsWriter(reaper: ActorRef, file: File) extends WatchedActor(reaper) {
       val extension = FilenameUtils.getExtension(filePath)
       val finalFilePath = filePathWithoutExtension + "_" + sheetName + "." + extension
       val writer = new PerformanceResultsWriter(finalFilePath, sheetName)
-      writer.write(rebalancedPortfolio)
+      writer.writeWide(rebalancedPortfolio)
+
     case portfolioPerformance: PortfolioPerformance =>
       portfolioPerformances = portfolioPerformances :+ portfolioPerformance
+
     case simulationParameters: SimulationParameters =>
       log.info(s"\n\n ResultsWriter: Got a summary: ${simulationParameters.portfolioDesign}")
       val summaryWorkbook =
@@ -36,7 +39,6 @@ class ResultsWriter(reaper: ActorRef, file: File) extends WatchedActor(reaper) {
       val fileOutputStream = new FileOutputStream(file)
       summaryWorkbook.write(fileOutputStream)
       fileOutputStream.close()
-
   }
 
 }

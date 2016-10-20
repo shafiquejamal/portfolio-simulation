@@ -151,33 +151,35 @@ trait PortfolioFixture {
         ETFData(startDatePlus12monthsPlus1Day, eTFD, "1", 565, 0, 0)
       )
 
-    val investmentInputDataSemiAnnually = investmentInputDataQuarterly ++
-    Seq(
-      ETFData(startDatePlus18months, eTFA, "1", 40, 0, 0),
-      ETFData(startDatePlus18months, eTFB, "1", 60, 0, 0),
-      ETFData(startDatePlus18months, eTFC, "1", 80, 0, 0),
-      ETFData(startDatePlus18months, eTFD, "1", 100, 0, 0),
-      ETFData(startDatePlus24months, eTFA, "1", 150, 0, 0),
-      ETFData(startDatePlus24months, eTFB, "1", 120, 0, 0),
-      ETFData(startDatePlus24months, eTFC, "1", 90, 0, 0),
-      ETFData(startDatePlus24months, eTFD, "1", 60, 0, 0),
-      ETFData(startDatePlus24monthsMinus1Day, eTFA, "1", 85, 0, 0),
-      ETFData(startDatePlus24monthsMinus1Day, eTFB, "1", 125, 0, 0),
-      ETFData(startDatePlus24monthsMinus1Day, eTFC, "1", 165, 0, 0),
-      ETFData(startDatePlus24monthsMinus1Day, eTFD, "1", 205, 0, 0),
-      ETFData(startDatePlus30months, eTFA, "1", 110, 0, 0),
-      ETFData(startDatePlus30months, eTFB, "1", 90, 0, 0),
-      ETFData(startDatePlus30months, eTFC, "1", 20, 0, 0),
-      ETFData(startDatePlus30months, eTFD, "1", 140, 0, 0),
-      ETFData(startDatePlus36months, eTFA, "1", 75, 0, 0),
-      ETFData(startDatePlus36months, eTFB, "1", 115, 0, 0),
-      ETFData(startDatePlus36months, eTFC, "1", 155, 1.75, 0),
-      ETFData(startDatePlus36months, eTFD, "1", 195, 0, 0),
-      ETFData(startDatePlus36monthsMinus1Day, eTFA, "1", 80, 0, 0),
-      ETFData(startDatePlus36monthsMinus1Day, eTFB, "1", 120, 0, 0),
-      ETFData(startDatePlus36monthsMinus1Day, eTFC, "1", 160, 1.75, 0),
-      ETFData(startDatePlus36monthsMinus1Day, eTFD, "1", 200, 0, 0)
-    )
+    val investmentInputDataSemiAnnuallyOnly =
+      Seq(
+        ETFData(startDatePlus18months, eTFA, "1", 40, 0, 0),
+        ETFData(startDatePlus18months, eTFB, "1", 60, 0, 0),
+        ETFData(startDatePlus18months, eTFC, "1", 80, 0, 0),
+        ETFData(startDatePlus18months, eTFD, "1", 100, 0, 0),
+        ETFData(startDatePlus24months, eTFA, "1", 150, 0, 0),
+        ETFData(startDatePlus24months, eTFB, "1", 120, 0, 0),
+        ETFData(startDatePlus24months, eTFC, "1", 90, 0, 0),
+        ETFData(startDatePlus24months, eTFD, "1", 60, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFA, "1", 85, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFB, "1", 125, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFC, "1", 165, 0, 0),
+        ETFData(startDatePlus24monthsMinus1Day, eTFD, "1", 205, 0, 0),
+        ETFData(startDatePlus30months, eTFA, "1", 110, 0, 0),
+        ETFData(startDatePlus30months, eTFB, "1", 90, 0, 0),
+        ETFData(startDatePlus30months, eTFC, "1", 20, 0, 0),
+        ETFData(startDatePlus30months, eTFD, "1", 140, 0, 0),
+        ETFData(startDatePlus36months, eTFA, "1", 75, 0, 0),
+        ETFData(startDatePlus36months, eTFB, "1", 115, 0, 0),
+        ETFData(startDatePlus36months, eTFC, "1", 155, 1.75, 0),
+        ETFData(startDatePlus36months, eTFD, "1", 195, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFA, "1", 80, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFB, "1", 120, 0, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFC, "1", 160, 1.75, 0),
+        ETFData(startDatePlus36monthsMinus1Day, eTFD, "1", 200, 0, 0)
+      )
+
+    val investmentInputDataSemiAnnually = investmentInputDataQuarterly ++ investmentInputDataSemiAnnuallyOnly
 
     val expectedQuantitiesQuarterly: Map[Int, Seq[FinalPortfolioQuantityToHave]] =
       Map(
@@ -303,6 +305,39 @@ trait PortfolioFixture {
             BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
     }
+
+    val expectedRebalancedPortfolioSemiAnnuallyOnly: Seq[ETFData] = investmentInputDataSemiAnnuallyOnly.map { eTFData =>
+      if (eTFData.asOfDate isBefore startDatePlus6months)
+        eTFData.copy(
+        quantity =
+          BigDecimal(expectedQuantitiesSemiAnnually(1).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+      )
+      else if (eTFData.asOfDate isBefore startDatePlus12months)
+        eTFData.copy(
+          quantity =
+            BigDecimal(expectedQuantitiesSemiAnnually(2).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+        )
+      else if (eTFData.asOfDate isBefore startDatePlus18months)
+        eTFData.copy(
+          quantity =
+            BigDecimal(expectedQuantitiesSemiAnnually(3).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+        )
+      else if (eTFData.asOfDate isBefore startDatePlus24months)
+        eTFData.copy(
+          quantity =
+            BigDecimal(expectedQuantitiesSemiAnnually(4).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+        )
+      else if (eTFData.asOfDate isBefore startDatePlus30months)
+        eTFData.copy(
+          quantity =
+            BigDecimal(expectedQuantitiesSemiAnnually(5).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+        )
+      else
+        eTFData.copy(
+          quantity =
+            BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
+        )
+                                                                                                        }
 
     val rebalancedPortfolio =
       RebalancedPortfolio(
