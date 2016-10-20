@@ -1,6 +1,7 @@
 package com.eigenroute.portfoliosimulation
 
 import akka.actor.ActorRef
+import com.eigenroute.portfoliosimulation.util.WatchedActor
 
 class PortfolioSimulator(reaper: ActorRef) extends WatchedActor(reaper) {
 

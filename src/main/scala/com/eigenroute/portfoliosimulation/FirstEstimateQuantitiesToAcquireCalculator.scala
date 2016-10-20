@@ -1,5 +1,8 @@
 package com.eigenroute.portfoliosimulation
 
+import com.eigenroute.portfoliosimulation.portfoliocalculation.{PortfolioQuantityToAcquire, PortfolioValueCalculation,
+ValueDifferencesCalculator}
+
 class FirstEstimateQuantitiesToAcquireCalculator(
     valueDifferencesCalculator: ValueDifferencesCalculator = new ValueDifferencesCalculator())
   extends PortfolioValueCalculation {

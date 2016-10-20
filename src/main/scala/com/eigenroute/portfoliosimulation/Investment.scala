@@ -1,6 +1,8 @@
 package com.eigenroute.portfoliosimulation
 
-import InvestmentPeriod._
+import com.eigenroute.portfoliosimulation.investmentperiod.InvestmentPeriod
+import com.eigenroute.portfoliosimulation.investmentperiod.InvestmentPeriod._
+import com.eigenroute.portfoliosimulation.portfoliocalculation._
 
 class Investment(
     investmentPeriod: InvestmentPeriod,

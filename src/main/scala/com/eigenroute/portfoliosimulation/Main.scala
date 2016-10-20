@@ -5,6 +5,10 @@ import java.io.File
 import akka.actor.{ActorSystem, Props}
 import akka.routing.SmallestMailboxPool
 import com.eigenroute.portfoliosimulation.db.DevProdDBConfig
+import com.eigenroute.portfoliosimulation.investmentperiod.InvestmentPeriodsGenerator
+import com.eigenroute.portfoliosimulation.reader.{ETFDAO, ETFDataFetcher}
+import com.eigenroute.portfoliosimulation.util.ReaperImpl
+import com.eigenroute.portfoliosimulation.writer.ResultsWriter
 
 import scala.util.Try
 

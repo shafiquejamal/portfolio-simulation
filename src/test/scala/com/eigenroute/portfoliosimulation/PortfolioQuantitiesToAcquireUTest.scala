@@ -1,5 +1,6 @@
 package com.eigenroute.portfoliosimulation
 
+import com.eigenroute.portfoliosimulation.portfoliocalculation.{PortfolioQuantitiesToAcquire, PortfolioQuantityToAcquire}
 import org.scalatest._
 
 class PortfolioQuantitiesToAcquireUTest extends FlatSpec with ShouldMatchers with PortfolioFixture {

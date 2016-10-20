@@ -1,7 +1,9 @@
 package com.eigenroute.portfoliosimulation
 
 import akka.actor.{ActorRef, PoisonPill}
-import com.eigenroute.portfoliosimulation.InvestmentPeriodsGenerator.GenerateInvestmentPeriods
+import com.eigenroute.portfoliosimulation.investmentperiod.InvestmentPeriodsGenerator.GenerateInvestmentPeriods
+import com.eigenroute.portfoliosimulation.investmentperiod.{InvestmentPeriod, InvestmentPeriods, InvestmentPeriodsGenerator}
+import com.eigenroute.portfoliosimulation.util.WatchedActor
 
 class PortfolioSimulationManager(
   reaper: ActorRef,

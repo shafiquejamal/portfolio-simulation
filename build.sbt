@@ -14,6 +14,7 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-actor" % "2.3.11",
   "org.apache.poi" % "poi" % "3.15",
   "org.apache.poi" % "poi-ooxml" % "3.15",
+  "org.flywaydb" % "flyway-core" % "4.0.3",
   "org.scalikejdbc" %% "scalikejdbc-test"   % "2.4.2"   % "test",
   "com.typesafe.akka" %% "akka-testkit" % "2.3.11" % "test",
   "org.scalamock" %% "scalamock-scalatest-support" % "3.2.2" % Test,

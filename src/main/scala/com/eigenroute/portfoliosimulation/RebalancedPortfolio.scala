@@ -1,5 +1,7 @@
 package com.eigenroute.portfoliosimulation
 
+import com.eigenroute.portfoliosimulation.portfoliocalculation.{FinalPortfolioQuantityToHave, PortfolioPerformance}
+
 case class RebalancedPortfolio(
     rebalancedETFData: Seq[ETFData],
     newQuantitiesChosenForThisRebalancing: Seq[FinalPortfolioQuantityToHave],
