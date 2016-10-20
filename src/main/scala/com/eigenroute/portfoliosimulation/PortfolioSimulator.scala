@@ -6,6 +6,7 @@ class PortfolioSimulator(reaper: ActorRef) extends WatchedActor(reaper) {
 
   override def receive = {
     case simulationParametersWithInvestmentPeriod: SimulationParametersWithInvestmentPeriod =>
+      // log.info(s"\n\nPortfolioSimulator (SimulationParametersWithInvestmentPeriod): ${simulationParametersWithInvestmentPeriod.investmentPeriod}")
       val simulationParameters = simulationParametersWithInvestmentPeriod.simulationParameters
       val rebalancePortfolio =
         new Investment(

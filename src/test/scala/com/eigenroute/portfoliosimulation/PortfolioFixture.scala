@@ -302,7 +302,20 @@ trait PortfolioFixture {
           quantity =
             BigDecimal(expectedQuantitiesSemiAnnually(6).find(_.eTFCode == eTFData.eTFCode).map(_.quantity).getOrElse(0))
         )
-                                                                                                    }
+    }
+
+    val rebalancedPortfolio =
+      RebalancedPortfolio(
+        expectedRebalancedPortfolioQuarterly,
+        Seq(),
+        10,
+        11,
+        null,
+        100060,
+        PortfolioPerformance(InvestmentPeriod(startDate, startDate.plusYears(5)), 7),
+        1000000,
+        100
+      )
   }
 
   trait DesiredValueFixture {

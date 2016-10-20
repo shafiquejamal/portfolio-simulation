@@ -15,13 +15,13 @@ object InvestmentPeriodsGenerator {
 class InvestmentPeriodsGenerator(reaper: ActorRef) extends WatchedActor(reaper) {
 
   override def receive = {
-    case generateInvestmentPeriods:GenerateInvestmentPeriods =>
-      log.info(s"\n\n InvestmentPeriodsGenerator:  received message: $generateInvestmentPeriods")
-      val foo = new InvestmentPeriodsCreator(
+    case generateInvestmentPeriods: GenerateInvestmentPeriods =>
+      log.info(s"\n\nInvestmentPeriodsGenerator (GenerateInvestmentPeriods): ${generateInvestmentPeriods.portfolioDesign}")
+      val investmentPeriods = new InvestmentPeriodsCreator(
         generateInvestmentPeriods.portfolioDesign,
         generateInvestmentPeriods.sortedCommonDatesETFData,
         generateInvestmentPeriods.investmentDurationYears).create
-      sender() ! InvestmentPeriods(foo)
+      sender() ! InvestmentPeriods(investmentPeriods)
       context.stop(self)
   }
 

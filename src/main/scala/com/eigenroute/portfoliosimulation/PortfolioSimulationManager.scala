@@ -1,6 +1,6 @@
 package com.eigenroute.portfoliosimulation
 
-import akka.actor.{PoisonPill, ActorRef}
+import akka.actor.{ActorRef, PoisonPill}
 import com.eigenroute.portfoliosimulation.InvestmentPeriodsGenerator.GenerateInvestmentPeriods
 
 class PortfolioSimulationManager(
@@ -15,6 +15,7 @@ class PortfolioSimulationManager(
 
   override def receive = {
     case parameters: SimulationParameters =>
+      log.info(s"\n\nPortfolioSimulationManager (SimulationParameters): ${parameters.portfolioDesign}")
       simulationParameters = parameters
       val generateInvestmentPeriods =
         GenerateInvestmentPeriods(
@@ -23,17 +24,25 @@ class PortfolioSimulationManager(
          parameters.investmentDurationYears)
       investmentPeriodsGenerator ! generateInvestmentPeriods
     case investmentPeriods: InvestmentPeriods =>
+      log.info(s"\n\nPortfolioSimulationManager (InvestmentPeriods): ${investmentPeriods.investmentPeriods.size}")
       investmentPeriodsToProcess = investmentPeriods.investmentPeriods
-      investmentPeriods.investmentPeriods foreach ( investmentPeriod => routerToSimulator ! investmentPeriod )
+      val simulationParametersWithInvestmentPeriods =
+        investmentPeriodsToProcess.map (investmentPeriod =>
+          SimulationParametersWithInvestmentPeriod(investmentPeriod, simulationParameters)
+        )
+      simulationParametersWithInvestmentPeriods foreach ( parametersAndInvestmentPeriods =>
+        routerToSimulator ! parametersAndInvestmentPeriods )
     case rebalancedPortfolio: RebalancedPortfolio =>
-      log.info(s"\n\n PortfolioSimulationManager: Received $rebalancedPortfolio")
+      // log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${rebalancedPortfolio.portfolioPerformance}")
       investmentPeriodsProcessed = investmentPeriodsProcessed + rebalancedPortfolio.portfolioPerformance.investmentPeriod
       resultsWriter ! rebalancedPortfolio
+      // log.info(s"\n\nPortfolioSimulationManager (RebalancedPortfolio): ${investmentPeriodsProcessed.size} >= ${investmentPeriodsToProcess.size} ?")
       if (investmentPeriodsProcessed.size >= investmentPeriodsToProcess.size) {
         context.stop(routerToSimulator)
         resultsWriter ! PoisonPill
         context.stop(self)
       }
+
   }
 
 }
